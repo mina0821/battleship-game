@@ -1,0 +1,403 @@
+\documentclass[12pt]{article}
+
+\usepackage{graphicx}
+\usepackage{paralist}
+\usepackage{amsfonts}
+
+\begin {document}
+
+% ---- PointT module ----
+\section* {Point ADT Module}
+
+\subsection*{Template Module}
+
+PointT
+
+\subsection* {Uses}
+
+none
+
+\subsection* {Syntax}
+
+\subsubsection* {Exported Types}
+
+PointT = ?
+
+\subsubsection* {Exported Access Programs}
+
+\begin{tabular}{| l | l | l | l |}
+\hline
+\textbf{Routine name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions}\\
+\hline
+PointT & real, real & PointT & PtOutBonds\\
+\hline
+\end{tabular}
+
+\subsection* {Semantics}
+
+\subsubsection* {State Variables}
+
+$x$: real\\
+$y$: real
+
+\subsubsection* {State Invariant}
+
+none
+
+\subsubsection* {Assumptions}
+The constructor PointT is called for each abstract object before any other access routine is called for that
+object.  The constructor cannot be called on an existing object.
+
+\subsubsection* {Access Routine Semantics}
+
+PointT($x, y$):
+\begin{itemize}
+\item transition: $x, y := x, y$
+\item output: $out := \mathit{self}$
+\item exception
+ $exc := ((\neg(0 < x \leq 10) \vee \neg(0 < y \leq 10)) \Rightarrow
+\mbox{PtOutBonds})$
+\end{itemize}
+
+% ---- ShipT module ----
+\newpage
+\section* {Ship ADT Module}
+
+\subsection* {Template Module}
+
+ShipT
+
+\subsection* {Uses}
+
+PointT
+
+\subsection* {Syntax}
+
+\subsubsection* {Exported Types}
+
+ShipT = ?
+
+\subsubsection* {Exported Access Programs}
+
+\begin{tabular}{| l | l | l | l |}
+\hline
+\textbf{Routine name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions}\\
+\hline
+ShipT & PointT, real, real, string & ShipT & OutOfBond\\
+\hline 
+\end{tabular}
+
+\subsection* {Semantics}
+
+\subsubsection* {State Variables}
+
+$\mathit{pts}$: PointT[ ] \\
+
+\subsubsection* {State Invariant}
+None
+
+\subsubsection* {Assumptions}
+The constructor ShipT is called for each abstract object before any other access routine is called for that
+object.  The constructor cannot be called on an existing object.
+
+\subsubsection* {Access Routine Semantics}
+
+\noindent RegionT($p, l, turn$):
+\begin{itemize}
+\item transition: $turn == "left" \Rightarrow (\forall(i:\mathbb{N}| 0 \leq i < l:
+pts[i].x=p.x,pts[i].y=p.y-i) $ \\
+$| turn == "right" \Rightarrow (\forall(i:\mathbb{N}| 0 \leq i < l:
+pts[i].x=p.x,pts[i].y=p.y+i) $ \\
+$| turn == "up" \Rightarrow (\forall(i:\mathbb{N}| 0 \leq i < l:
+pts[i].x=p.x-i,pts[i].y=p.y) $ \\
+$| turn == "down" \Rightarrow (\forall(i:\mathbb{N}| 0 \leq i < l:
+pts[i].x=p.x+i,pts[i].y=p.y) $
+\item output: $out := \mathit{self}$
+\item exception: $exc := \exists ( i: \mathbb{N} | 0 \leq i < 5:
+\neg 0 < pts[i].x \leq 10 \vee 
+\neg 0 < pts[i].y \leq 10) \Rightarrow \mbox{OutOfBond}$
+\end{itemize}
+
+% ---- BoardT ADT module ----
+\newpage
+\section* {Board ADT Module}
+
+\subsection* {Template Module}
+
+BoardT
+
+\subsection* {Uses}
+
+PointT, ShipT
+
+\subsection* {Syntax}
+
+\subsubsection* {Exported Types}
+
+BoardT = ?
+
+\subsubsection* {Exported Access Programs}
+
+\begin{tabular}{| l | l | l | l |}
+\hline
+\textbf{Routine name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions}\\
+\hline
+BoardT &  & BoardT &\\
+\hline 
+state & PointT & real &\\
+\hline 
+occupied & ShipT &  &\\
+\hline 
+conflict & & boolean &\\
+\hline 
+sunk & ShipT & boolean &\\
+\hline 
+\end{tabular}
+
+\subsection* {Semantics}
+
+\subsubsection* {State Variables}
+
+$\mathit{board}$: real[ ][ ] \\
+
+\subsubsection* {State Invariant}
+None
+
+\subsubsection* {Assumptions}
+The constructor ShipT is called for each abstract object before any other access routine is called for that
+object.  The constructor cannot be called on an existing object.
+
+\subsubsection* {Access Routine Semantics}
+
+\noindent BoardT( ):
+\begin{itemize}
+\item transition: $\forall (i,j : \mathbb{N} | 0 \leq i < 10 \wedge 0 \leq j < 10 :
+board[i][j] = 0 )$
+\item output: $out := \mathit{self}$
+\end{itemize}
+
+\noindent state($pt$):
+\begin{itemize}
+\item output: $out := board[pt.x-1][pt.y-1]$
+\end{itemize}
+
+\noindent occupied($ship$):
+\begin{itemize}
+\item transition: $\forall (i:\mathbb{N}|0 \leq i < ship.pts.length() : 
+board[ship.pts[i].x -1][ship.pts[i].y -1] =board[ship.pts[i].x -1][ship.pts[i].y -1]+ 6)$
+\end{itemize}
+
+\noindent conflict( ):
+\begin{itemize}
+\item output: $out:= \exists (i,j:\mathbb{N}|0 \leq i < 10 \wedge 0 \leq i < 10 : 
+board[i][j] > 6)$
+\end{itemize}
+
+\noindent sunk($ship$):
+\begin{itemize}
+\item output: $out:= \forall (i:\mathbb{N}|0 \leq i < ship.pts.length() : 
+board[ship.pts[i].x -1][ship.pts[i].y -1] == 2)$
+\end{itemize}
+
+
+% ---- Ship Placement ADT module ----
+\newpage
+\section* {Ship Placement ADT Module}
+
+\subsection* {Template Module}
+
+shipplaceT
+
+\subsection* {Uses}
+
+PointT, ShipT, BoardT
+
+\subsection* {Syntax}
+
+\subsubsection* {Exported Types}
+
+ShipPlaceT = ?
+
+\subsubsection* {Exported Access Programs}
+
+\begin{tabular}{| l | l | l | l |}
+\hline
+\textbf{Routine name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions}\\
+\hline
+ShipPlaceT & ShipT, ShipT, ShipT, ShipT, ShipT & ShipPlaceT & ShipConflict\\
+\hline 
+valid & PointT & boolean &\\
+\hline 
+\end{tabular}
+
+\subsection* {Semantics}
+
+\subsubsection* {State Variables}
+
+$\mathit{ships}$: ShipT[ ] \\
+$\mathit{temp}$: BoardT \\
+
+\subsubsection* {State Invariant}
+None
+
+\subsubsection* {Assumptions}
+The constructor ShipT is called for each abstract object before any other access routine is called for that
+object.  The constructor cannot be called on an existing object.
+
+\subsubsection* {Access Routine Semantics}
+
+\noindent ShipPlaceT($s1,s2,s3,s4,s5$):
+\begin{itemize}
+\item transition: $ships = [s1,s2,s3,s4,s5] ; \\
+\forall (i:\mathbb{N} | 0 \leq i < 5: temp.occupied(ships[i]))$
+\item output: $out := \mathit{self}$
+\item exception: $exc:= temp.conflict() \Rightarrow ShipConflict$
+\end{itemize}
+
+\noindent valid($pt$):
+\begin{itemize}
+\item output: $out := \exists (i:\mathbb{N} | 0 \leq i < 5 :
+\exists(j:\mathbb{N} | 0 \leq j < ships[i].pts.length() : ships[i].pts[j] == pt))$
+\end{itemize}
+
+% ---- Player ADT module ----
+\newpage
+\section* {Player ADT Module}
+
+\subsection* {Template Module}
+
+PlayerT
+
+\subsection* {Uses}
+
+PointT, ShipT, BoardT, ShipPlaceT
+
+\subsection* {Syntax}
+
+\subsubsection* {Exported Types}
+
+PlayerT = ?
+
+\subsubsection* {Exported Access Programs}
+
+\begin{tabular}{| l | l | l | l |}
+\hline
+\textbf{Routine name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions}\\
+\hline
+PlayerT & string, ShipPlaceT & PlayerT & \\
+\hline 
+isover &  & boolean &\\
+\hline 
+gotshot & PointT & &\\
+\hline 
+isSunk &  & boolean &\\
+\hline
+\end{tabular}
+
+\subsection* {Semantics}
+
+\subsubsection* {State Variables}
+
+$\mathit{name}$: String \\
+$\mathit{ships}$: ShipPlaceT \\
+$\mathit{board}$: BoardT \\
+$\mathit{ship\_sunk}$: real \\
+
+\subsubsection* {State Invariant}
+None
+
+\subsubsection* {Assumptions}
+The constructor ShipT is called for each abstract object before any other access routine is called for that
+object.  The constructor cannot be called on an existing object.
+
+\subsubsection* {Access Routine Semantics}
+
+\noindent PlayerT($name,ships$):
+\begin{itemize}
+\item transition: $name,ships,ship\_sunk = name,ships,0 ; \\
+\forall (i:\mathbb{N} | 0 \leq i < 5: board.occupied(ships.ships[i]))$
+\item output: $out := \mathit{self}$
+\end{itemize}
+
+\noindent isover( ):
+\begin{itemize}
+\item output: $out := ship\_sunk == 5$
+\end{itemize}
+
+\noindent gotshot($pt$):
+\begin{itemize}
+\item transition: $(ships.valid(pt) \Rightarrow (isSunk() \Rightarrow
+sunk\_ship = sunk\_ship + 1) \wedge board.board[pt.x-1][pt.y-1]=2$) \\
+$| (\neg ships.valid(pt) \Rightarrow board.board[pt.x-1][pt.y-1]=1)$
+\end{itemize}
+
+\noindent isSunk( ):
+\begin{itemize}
+\item output: $ out:= +(i : \mathbb{N} | 0 \leq i < 5 \wedge
+board.sunk(ships.ships[i]) : 1) \\ \geq sunk\_ship)$
+\end{itemize}
+
+
+% ---- Client module ----
+\newpage
+\section* {Client Module}
+
+\subsection* {Template Module}
+
+Client
+
+\subsection* {Uses}
+
+PointT, ShipT, BoardT, ShipPlaceT, PlayerT
+
+\subsection* {Syntax}
+
+\subsubsection* {Exported Access Programs}
+
+\begin{tabular}{| l | l | l | l |}
+\hline
+\textbf{Routine name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions}\\
+\hline
+init & PlayerT, PlayerT &  & \\
+\hline 
+play & PointT &  &\\
+\hline
+\end{tabular}
+
+\subsection* {Semantics}
+
+\subsubsection* {State Variables}
+
+$\mathit{p1}$: PlayerT \\
+$\mathit{p2}$: PlayerT \\
+$\mathit{round}$: real \\
+
+\subsubsection* {State Invariant}
+None
+
+\subsubsection* {Assumptions}
+init() is called before any other access program.
+
+\subsubsection* {Access Routine Semantics}
+
+\noindent init():
+\begin{itemize}
+\item transition: $round := 0$
+\item output: $out := \mathit{self}$
+\end{itemize}
+
+\noindent play($pt$):
+\begin{itemize}
+\item transition: $notover(p1,p2) \Rightarrow (turn \quad \textrm{mod} \quad 2 == 0 
+\Rightarrow p2.gotshot(pt) \wedge round = round + 1\\
+| turn \quad \textrm{mod}\quad 2 == 1 \Rightarrow p1.gotshot(pt) \wedge round = round + 1)$
+\end{itemize}
+
+
+\subsubsection* {Local Functions}
+notover: PlayerT$\times$ PlayerT $\rightarrow$ boolean
+
+\noindent isSunk $(p1,p2) \equiv \neg p1.isover() \vee \neg  p2.isover()$
+
+\end {document}
+\grid
